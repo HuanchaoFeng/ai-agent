@@ -2,6 +2,7 @@ package com.yupi.yuaiagent.advisor;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.advisor.api.*;
+import org.springframework.ai.converter.StructuredOutputConverter;
 import reactor.core.publisher.Flux;
 
 import java.util.HashMap;
@@ -50,4 +51,5 @@ public class ReReadingAdvisor implements CallAroundAdvisor, StreamAroundAdvisor 
     public int getOrder() {
         return 0;
     }
+
 }

@@ -1,5 +1,8 @@
-
+# 存储文件和loca都不上传
+chat-memory/
 application-local.yml
+
+src/main/resources/document/
 
 HELP.md
 target/

@@ -12,7 +12,7 @@ import java.util.UUID;
 public class loveAppTest {
 
     @Resource
-    private loveApp  loveApp;
+    private LoveApp loveApp;
 
     @Test
     public void testChat() {
@@ -28,7 +28,22 @@ public class loveAppTest {
         message = "what's my name?";
         answer = loveApp.doChat(message, chatId);
         Assertions.assertNotNull(answer);
+    }
 
+    @Test
+    public void testChatLoveReport() {
+        String message = "hello, I'm phoenix";
+        String chatId = UUID.randomUUID().toString();
+        LoveReport loveReport = loveApp.doChatWithReport(message, chatId);
+        Assertions.assertNotNull(loveReport);
 
+    }
+
+    @Test
+    public void testChatRAG() {
+        String message = "我已经结婚了，但是婚后关系不太亲密，怎么办？";
+        String chatId = UUID.randomUUID().toString();
+        String answer = loveApp.doChatWithRAG(message, chatId);
+        Assertions.assertNotNull(answer);
     }
 }
