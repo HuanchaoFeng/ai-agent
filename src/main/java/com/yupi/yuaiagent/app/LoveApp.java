@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.client.advisor.QuestionAnswerAdvisor;
+import org.springframework.ai.chat.client.advisor.api.Advisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
@@ -50,6 +51,12 @@ public class LoveApp {
 
     @Resource
     private VectorStore loveAppVectorStore;
+
+    @Resource
+    private Advisor loveAppRagCloudAdvisor;
+
+    @Resource
+    private VectorStore pgVectorVectorStore;
 
     //构建聊天客户端
     public LoveApp(ChatModel dashscopeChatModel){
@@ -110,16 +117,34 @@ public class LoveApp {
      *  RAG
      */
     public String doChatWithRAG(String message, String chatId){
+        /**
+         *      这里的QuestionAnswerAdvisor其实就是把你的向量数据库传入
+         *      他会自动去匹配筛选结果
+         */
         ChatResponse chatResponse = chatClient.prompt()
                 .user(message)
                 .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
                         .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
-                .advisors(new QuestionAnswerAdvisor(loveAppVectorStore))
+                .advisors(new QuestionAnswerAdvisor(pgVectorVectorStore))
                 .call()
                 .chatResponse();
         String context = chatResponse.getResult().getOutput().getText();
         log.info("model response context={}",context);
         return context;
+        /**
+         *      使用云知识库 + RetrievalAugmentationAdvisor
+         */
+
+//        ChatResponse chatResponse = chatClient.prompt()
+//                .user(message)
+//                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+//                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+//                .advisors(loveAppRagCloudAdvisor)
+//                .call()
+//                .chatResponse();
+//        String context = chatResponse.getResult().getOutput().getText();
+//        log.info("model response context={}",context);
+//        return context;
     }
 
 
