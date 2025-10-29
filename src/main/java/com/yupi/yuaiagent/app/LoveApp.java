@@ -5,6 +5,7 @@ package com.yupi.yuaiagent.app;
 import com.yupi.yuaiagent.advisor.MyLoggerAdvisor;
 import com.yupi.yuaiagent.advisor.ReReadingAdvisor;
 import com.yupi.yuaiagent.chatMemory.FileBasedChatMemory;
+import com.yupi.yuaiagent.tool.PDFGenerationTool;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
@@ -15,6 +16,7 @@ import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.chat.memory.InMemoryChatMemory;
 import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.ai.chat.model.ChatResponse;
+import org.springframework.ai.tool.ToolCallback;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
 
@@ -57,6 +59,10 @@ public class LoveApp {
 
     @Resource
     private VectorStore pgVectorVectorStore;
+
+
+    @Resource
+    private ToolCallback[] allTools; // 所有工具的实例对象
 
     //构建聊天客户端
     public LoveApp(ChatModel dashscopeChatModel){
@@ -145,6 +151,24 @@ public class LoveApp {
 //        String context = chatResponse.getResult().getOutput().getText();
 //        log.info("model response context={}",context);
 //        return context;
+    }
+
+    /**
+     *  工具
+     */
+    public String doChatWithTools(String message, String chatId) {
+
+        ChatResponse response = chatClient
+                .prompt()
+                .user(message)
+                .advisors(spec -> spec.param(CHAT_MEMORY_CONVERSATION_ID_KEY, chatId)
+                        .param(CHAT_MEMORY_RETRIEVE_SIZE_KEY, 10))
+                .tools(allTools)
+                .call()
+                .chatResponse();
+        String content = response.getResult().getOutput().getText();
+        log.info("content: {}", content);
+        return content;
     }
 
 
