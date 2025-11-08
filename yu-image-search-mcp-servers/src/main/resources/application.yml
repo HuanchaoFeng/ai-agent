@@ -1,8 +1,0 @@
-server:
-  port: 8127
-
-spring:
-  application:
-    name: yu-image-search-mcp-servers
-  profiles:
-    active: stdio
